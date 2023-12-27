@@ -11,4 +11,4 @@ The Toolbox image for [pi-builder](https://github.com/jmcombs/pi-builder)
 
 This container is based on [Debian](https://hub.docker.com/_/debian), is multi-arch (`AMD64` & `ARM64`), and contains all relevant Python modules and tools needed to support [pi-builder](https://github.com/jmcombs/pi-builder) for building Raspberry Pi images.
 
-> Note: This project started out as a fork of the [PiKVM](https://github.com/pikvm) [pi-builder](https://github.com/pikvm/pi-builder) project.
+**Note**: This project started out as a fork of the [PiKVM](https://github.com/pikvm) [pi-builder](https://github.com/pikvm/pi-builder) project.
