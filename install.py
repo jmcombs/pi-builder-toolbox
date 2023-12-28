@@ -74,13 +74,13 @@ def _install_card(rootfs_path: str, dev_path: str, disk_conf: str) -> None:
     _run(["dd", "if=/dev/zero", f"of={dev_path}", "bs=1M", "count=32"])
     _run(["partprobe", dev_path])
 
-    _run(["/tools/disk", "format", dev_path], input=disk_conf)
-    _run(["/tools/disk", "mkfs", dev_path], input=disk_conf)
+    _run(["/tools/disk.py", "format", dev_path], input=disk_conf)
+    _run(["/tools/disk.py", "mkfs", dev_path], input=disk_conf)
 
-    _run(["/tools/disk", "mount", dev_path, "__mnt__"], input=disk_conf)
+    _run(["/tools/disk.py", "mount", dev_path, "__mnt__"], input=disk_conf)
     to_copy = [os.path.join(rootfs_path, name) for name in os.listdir(rootfs_path)]
     _run(["rsync", "-a", "--quiet", *to_copy, "__mnt__"])
-    _run(["/tools/disk", "umount", dev_path], input=disk_conf)
+    _run(["/tools/disk.py", "umount", dev_path], input=disk_conf)
 
 def _install_image(devfs_prefix: str, rootfs_path: str, image_path: str, compress: bool, disk_conf: str) -> None:
     """
@@ -96,7 +96,7 @@ def _install_image(devfs_prefix: str, rootfs_path: str, image_path: str, compres
     Raises:
         SystemExit: If any of the commands fail.
     """
-    size_str = _run(["/tools/disk", "print-size"], input=disk_conf, read=True)
+    size_str = _run(["/tools/disk.py", "print-size"], input=disk_conf, read=True)
     _run(["truncate", "-s", size_str, image_path])
 
     loop_path = devfs_prefix + "/" + _run(["losetup", "-f"], read=True)
