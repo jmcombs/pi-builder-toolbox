@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     rsync \
     udev \
     xz-utils \
+    arp-scan \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 RUN mkdir /tools
