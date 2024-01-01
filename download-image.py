@@ -42,7 +42,7 @@ def _run(cmd: list[str], input: (str | None) = None, read: bool = False) -> str:
     return (data.decode().strip() if read else "")
 
 
-def download_archlinuxarm(arch, board, dist_repo_url, output_dir):
+def download_archlinuxarm(arch, board, dist_repo_url, output_dir, uid, gid):
     """
     Download the Arch Linux ARM image for the specified architecture and board.
 
@@ -61,6 +61,7 @@ def download_archlinuxarm(arch, board, dist_repo_url, output_dir):
     with open(f'{filename}.tmp', 'wb') as file:
         file.write(response.content)
     os.rename(f'{filename}.tmp', f'{filename}')
+    _run(['chown', '--recursive', f'{uid}:{gid}', f'{output_dir}'])
     print(f'Downloaded: {filename}')
 
 def get_latest_image_url(url):
@@ -131,7 +132,7 @@ def download_rpios(arch, board, dist_repo_url, output_dir, cache_dir):
     except Exception as e:
         print(f'Error building {filename}: {str(e)}')
 
-def build_rpios_tgz(filename, img_file, cache_dir, output_dir):
+def build_rpios_tgz(filename, img_file, cache_dir, output_dir, uid, gid):
     """
     Build a compressed tarball (.tgz) from the Raspberry Pi OS image.
 
@@ -151,6 +152,7 @@ def build_rpios_tgz(filename, img_file, cache_dir, output_dir):
         _run(['tar', '-czf', f'{img_file}.tmp', '-C', '/mnt/rpios', '.'])
         _run(['chown', f'{os.getuid()}:{os.getgid()}', f'{img_file}.tmp'])
         _run(['mv', f'{img_file}.tmp', f'{output_dir}/{filename}.tgz'])
+        _run(['chown', '--recursive', f'{uid}:{gid}', f'{output_dir}'])
         _run(['umount', '/mnt/rpios/boot/firmware'])
         _run(['umount', '/mnt/rpios'])
         _run(['kpartx', '-d', img_file])
@@ -170,15 +172,17 @@ def main() -> None:
     parser.add_argument('--board', type=str, help='Raspberry Pi board type (rpi2, rpi3, rpi4, etc)')
     parser.add_argument('--output-dir', default='/root/base', help='Output directory for saving the image')
     parser.add_argument('--cache-dir', default='/root/.cache', help='Cache directory for saving temporary files')
+    parser.add_argument('--uid', type=int, help='User ID for the output directory')
+    parser.add_argument('--gid', type=int, help='Group ID for the output directory')
     parser.set_defaults(log_level=logging.INFO)
 
     options = parser.parse_args()
     logging.basicConfig(level=options.log_level, format="%(message)s")
 
     if options.os == 'rpios':
-        download_rpios(options.arch, options.board, options.os_repo_url, options.output_dir, options.cache_dir)
+        download_rpios(options.arch, options.board, options.os_repo_url, options.output_dir, options.cache_dir, options.uid, options.gid)
     elif options.os == 'archlinuxarm':
-        download_archlinuxarm(options.arch, options.board, options.os_repo_url, options.output_dir)
+        download_archlinuxarm(options.arch, options.board, options.os_repo_url, options.output_dir, options.uid, options.gid)
 
 if __name__ == "__main__":
     main()
