@@ -94,7 +94,7 @@ def get_latest_image_url(url):
     print(f'Latest Raspberry Pi OS image: {image_name}')
     return xz_url
 
-def download_rpios(arch, board, dist_repo_url, output_dir, cache_dir):
+def download_rpios(arch, board, dist_repo_url, output_dir, cache_dir, uid, gid):
     """
     Download the Raspberry Pi OS image for the specified architecture and board.
 
@@ -126,7 +126,7 @@ def download_rpios(arch, board, dist_repo_url, output_dir, cache_dir):
         os.remove(xz_file)
         os.rename(tmp_file, img_file)
         
-        build_rpios_tgz(filename, img_file, cache_dir, output_dir)  # Call build_rpios_tgz function with the filename
+        build_rpios_tgz(filename, img_file, cache_dir, output_dir, uid, gid)  # Call build_rpios_tgz function with the filename
         print(f'Image built: {filename}')
         
     except Exception as e:
