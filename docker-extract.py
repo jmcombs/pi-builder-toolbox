@@ -182,20 +182,6 @@ def _hook_set_resolv_symlink(root_path: str, target_path: str) -> None:
     os.symlink(target_path, path)
 
 
-def _hook_remove_qemu(root_path: str) -> None:
-    """
-    Remove QEMU from the root filesystem.
-
-    Args:
-        root_path (str): The path to the root filesystem.
-    """
-    _logger.info(":: Removing QEMU ...")
-    for name in os.listdir(os.path.join(root_path, "usr/bin")):
-        if name.startswith("qemu-") and name.endswith(("-static", "-static-orig")):
-            path = os.path.join(root_path, "usr/bin", name)
-            _logger.info("::    Removing %r ...", path)
-            os.remove(path)
-
 # =====
 def main() -> None:
     """
@@ -209,7 +195,6 @@ def main() -> None:
     parser.add_argument("--root", default="rootfs", help="Output directory (defaults to 'rootfs')")
     parser.add_argument("--set-hostname", default="", help="Set /etc/hostname")
     parser.add_argument("--set-resolv-symlink", default="", help="Symlink /etc/resolv.conf to specified path")
-    parser.add_argument("--remove-qemu", action="store_true", help="Remove /usr/bin/qemu-*-static{,-orig}")
     parser.add_argument("input")
     parser.set_defaults(log_level=logging.INFO)
 
@@ -240,9 +225,6 @@ def main() -> None:
 
             if options.set_resolv_symlink:
                 _hook_set_resolv_symlink(options.root, options.set_resolv_symlink)
-
-            if options.remove_qemu:
-                _hook_remove_qemu(options.root)
 
             _logger.info(":: Success!")
 
